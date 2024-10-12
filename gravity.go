@@ -1,6 +1,7 @@
 package satellite
 
 import (
+	"fmt"
 	"log"
 	"math"
 )
@@ -50,6 +51,43 @@ func getGravConst(name Gravity) (grav GravConst) {
 		grav.j3oj2 = grav.j3 / grav.j2
 	default:
 		log.Panic(name, "is not a valid gravity model")
+	}
+
+	return
+}
+
+// Returns a GravConst with correct information on requested model provided through the name parameter
+func getGravConstV2(name Gravity) (grav GravConst, err error) {
+	switch name {
+	case GravityWGS72Old:
+		grav.mu = 398600.79964
+		grav.radiusearthkm = 6378.135
+		grav.xke = 0.0743669161
+		grav.tumin = 1.0 / grav.xke
+		grav.j2 = 0.001082616
+		grav.j3 = -0.00000253881
+		grav.j4 = -0.00000165597
+		grav.j3oj2 = grav.j3 / grav.j2
+	case GravityWGS72:
+		grav.mu = 398600.8
+		grav.radiusearthkm = 6378.135
+		grav.xke = 60.0 / math.Sqrt(grav.radiusearthkm*grav.radiusearthkm*grav.radiusearthkm/grav.mu)
+		grav.tumin = 1.0 / grav.xke
+		grav.j2 = 0.001082616
+		grav.j3 = -0.00000253881
+		grav.j4 = -0.00000165597
+		grav.j3oj2 = grav.j3 / grav.j2
+	case GravityWGS84:
+		grav.mu = 398600.5
+		grav.radiusearthkm = 6378.137
+		grav.xke = 60.0 / math.Sqrt(grav.radiusearthkm*grav.radiusearthkm*grav.radiusearthkm/grav.mu)
+		grav.tumin = 1.0 / grav.xke
+		grav.j2 = 0.00108262998905
+		grav.j3 = -0.00000253215306
+		grav.j4 = -0.00000161098761
+		grav.j3oj2 = grav.j3 / grav.j2
+	default:
+		err = fmt.Errorf("%s is not a valid gravity model", name)
 	}
 
 	return
