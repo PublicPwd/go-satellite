@@ -62,6 +62,13 @@ func ParseTLE(line1, line2 string, gravConst Gravity) (sat Satellite) {
 
 // Parses a two line element dataset into a Satellite struct
 func ParseTLEV2(line1, line2 string, gravConst Gravity) (*Satellite, error) {
+	if len(line1) < 61 {
+		return nil, errors.New("invalid line 1 length")
+	}
+	if len(line2) < 63 {
+		return nil, errors.New("invalid line 2 length")
+	}
+
 	whichConst, err := getGravConstV2(gravConst)
 	if err != nil {
 		return nil, err
