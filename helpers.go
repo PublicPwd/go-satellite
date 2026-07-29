@@ -1,6 +1,7 @@
 package satellite
 
 import (
+	"errors"
 	"log"
 	"math"
 	"strconv"
@@ -39,7 +40,11 @@ func ParseTLE(line1, line2 string, gravConst Gravity) (sat Satellite) {
 	sat.whichconst = getGravConst(gravConst)
 
 	// LINE 1 BEGIN
-	sat.satnum = parseInt(strings.TrimSpace(line1[2:7]))
+	var err error
+	sat.satnum, err = parseSatNum(strings.TrimSpace(line1[2:7]))
+	if err != nil {
+		log.Fatal(err)
+	}
 	sat.epochyr = parseInt(line1[18:20])
 	sat.epochdays = parseFloat(line1[20:32])
 
@@ -232,4 +237,33 @@ func parseInt(strIn string) (ret int64) {
 		log.Panic(err)
 	}
 	return ret
+}
+
+// https://www.space-track.org/documentation#/tle-alpha5
+func parseSatNum(text string) (int64, error) {
+	if len(text) == 0 {
+		return 0, errors.New("satellite number is empty")
+	}
+	if text[0] >= '0' && text[0] <= '9' {
+		return strconv.ParseInt(text, 10, 64)
+	}
+	if text[0] == 'I' || text[0] == 'O' {
+		return 0, errors.New("invalid satellite number: first character must be A-Z or 0-9")
+	}
+	if text[0] < 'A' || text[0] > 'Z' {
+		return 0, errors.New("invalid satellite number: first character must be A-Z or 0-9")
+	}
+
+	val := text[0] - 'A'
+	if val >= ('O' - 'A') {
+		val -= 2
+	} else if val >= ('I' - 'A') {
+		val -= 1
+	}
+
+	mod, err := strconv.ParseInt(text[1:], 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return int64(val+10)*10000 + mod, nil
 }
