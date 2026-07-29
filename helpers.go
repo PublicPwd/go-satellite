@@ -2,12 +2,11 @@ package satellite
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"math"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Constants
@@ -80,58 +79,58 @@ func ParseTLEV2(line1, line2 string, gravConst Gravity) (*Satellite, error) {
 	}
 
 	// LINE 1 BEGIN
-	satNum, err := strconv.ParseInt(strings.TrimSpace(line1[2:7]), 10, 64)
+	satNum, err := parseSatNum(strings.TrimSpace(line1[2:7]))
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid sat num")
+		return nil, fmt.Errorf("invalid sat num: %w", err)
 	}
 	epochYear, err := strconv.ParseInt(line1[18:20], 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid epoch year")
+		return nil, fmt.Errorf("invalid epoch year: %w", err)
 	}
 	epochDays, err := strconv.ParseFloat(line1[20:32], 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid epoch days")
+		return nil, fmt.Errorf("invalid epoch days: %w", err)
 	}
 
 	// These three can be negative / positive
 	ndot, err := strconv.ParseFloat(strings.Replace(line1[33:43], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid ndot")
+		return nil, fmt.Errorf("invalid ndot: %w", err)
 	}
 	nddot, err := strconv.ParseFloat(strings.Replace(line1[44:45]+"."+line1[45:50]+"e"+line1[50:52], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid nddot")
+		return nil, fmt.Errorf("invalid nddot: %w", err)
 	}
 	bstar, err := strconv.ParseFloat(strings.Replace(line1[53:54]+"."+line1[54:59]+"e"+line1[59:61], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid bstar")
+		return nil, fmt.Errorf("invalid bstar: %w", err)
 	}
 	// LINE 1 END
 
 	// LINE 2 BEGIN
 	inclo, err := strconv.ParseFloat(strings.Replace(line2[8:16], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid inclo")
+		return nil, fmt.Errorf("invalid inclo: %w", err)
 	}
 	nodeo, err := strconv.ParseFloat(strings.Replace(line2[17:25], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid nodeo")
+		return nil, fmt.Errorf("invalid nodeo: %w", err)
 	}
 	ecco, err := strconv.ParseFloat("."+line2[26:33], 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid ecco")
+		return nil, fmt.Errorf("invalid ecco: %w", err)
 	}
 	argpo, err := strconv.ParseFloat(strings.Replace(line2[34:42], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid argpo")
+		return nil, fmt.Errorf("invalid argpo: %w", err)
 	}
 	mo, err := strconv.ParseFloat(strings.Replace(line2[43:51], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid mo")
+		return nil, fmt.Errorf("invalid mo: %w", err)
 	}
 	no, err := strconv.ParseFloat(strings.Replace(line2[52:63], " ", "", 2), 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid no")
+		return nil, fmt.Errorf("invalid no: %w", err)
 	}
 	// LINE 2 END
 
